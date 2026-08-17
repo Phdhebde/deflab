@@ -19,3 +19,9 @@ venv/
 Thumbs.db
 .idea/
 .vscode/
+
+# Documentation
+docs/modules/
+
+# Autres
+*.docx
