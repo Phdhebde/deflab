@@ -32,6 +32,8 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          # Sans ce chemin, le cache cherche `**/requirements.txt` et échoue.
+          cache-dependency-path: requirements-docs.txt
       - run: pip install -r requirements-docs.txt
       - run: python tools/sync_docs.py
       - name: mkdocs build --strict
@@ -85,7 +87,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # docs/index.md pointe vers docs/modules/index.md, qui est généré et non
+      # versionné : sans cette étape, lychee le voit comme un lien mort.
+      - name: Générer les pages de modules
+        run: python tools/sync_docs.py
+
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --exclude-path docs/modules './**/*.md'
+          # docs/modules/ est exclu des *sources* (contenu dupliqué depuis
+          # modules/) mais existe bien comme *cible* grâce à l'étape ci-dessus.
+          # 429 accepté : github.com limite le débit sur les runners partagés.
+          args: --no-progress --accept 200,206,429 --exclude-path docs/modules './**/*.md'
           fail: true

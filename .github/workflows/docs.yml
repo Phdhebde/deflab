@@ -22,6 +22,8 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          # Sans ce chemin, le cache cherche `**/requirements.txt` et échoue.
+          cache-dependency-path: requirements-docs.txt
 
       - run: pip install -r requirements-docs.txt
 
