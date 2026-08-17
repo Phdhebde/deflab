@@ -64,7 +64,7 @@ def main() -> int:
     rows = []
     for module in modules:
         slug = module.name
-        markdown = (module / "README.md").read_text(encoding="utf-8")
+        markdown = (module / "README.md").read_text(encoding="utf-8-sig")
         title = extract(markdown, TITLE_RE, slug)
         status = extract(markdown, STATUS_RE, "—")
 

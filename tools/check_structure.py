@@ -43,8 +43,14 @@ def normalize(text: str) -> str:
     return text.replace("’", "'").casefold().strip()
 
 
+def read(path: Path) -> str:
+    """Lit en tolérant un BOM : un fichier créé sous Windows en garde souvent un,
+    et il suffirait à masquer la première ligne (donc la première cible Make)."""
+    return path.read_text(encoding="utf-8-sig")
+
+
 def check_sections(readme: Path) -> list[str]:
-    found = SECTION_RE.findall(readme.read_text(encoding="utf-8"))
+    found = SECTION_RE.findall(read(readme))
     actual = [(int(num), title) for num, title in found]
 
     errors = []
@@ -70,7 +76,7 @@ def check_makefile(makefile: Path) -> list[str]:
     if not makefile.exists():
         return ["Makefile manquant (interface uniforme up/down/attack/verify/clean)"]
 
-    targets = set(TARGET_RE.findall(makefile.read_text(encoding="utf-8")))
+    targets = set(TARGET_RE.findall(read(makefile)))
     missing = [t for t in REQUIRED_MAKE_TARGETS if t not in targets]
     return [f"cible Make manquante : `{t}`" for t in missing]
 
