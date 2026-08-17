@@ -78,7 +78,9 @@ jobs:
           for d in modules/*/detections; do
             [ -d "$d" ] || continue
             echo "::group::$d"
-            sigma check "$d"
+            # --fail-on-issues : sans ce drapeau, `sigma check` sort en 0 même
+            # avec des métadonnées invalides (tag ATT&CK inexistant, par ex.).
+            sigma check --fail-on-issues "$d"
             echo "::endgroup::"
           done
 

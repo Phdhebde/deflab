@@ -1,0 +1,41 @@
+# RÈGLE DE DÉPART — NON VALIDÉE.
+# Elle n'a encore été confrontée ni au scénario (section 8) ni à un corpus
+# d'activité légitime (section 9). Tant que `make verify` n'a pas tourné,
+# considérer ce fichier comme une hypothèse, pas comme une détection.
+title: Téléchargement via certutil
+id: 7c1f4b02-9d3e-4a6f-8b21-5e0c9a7d4f16
+status: experimental
+description: >-
+  Détecte l'usage de certutil.exe pour récupérer un fichier distant. Certutil
+  est un binaire signé Microsoft présent par défaut : son intérêt pour un
+  attaquant est précisément de ne pas avoir à déposer d'outil sur la machine.
+references:
+  - https://attack.mitre.org/techniques/T1105/
+  - https://lolbas-project.github.io/lolbas/Binaries/Certutil/
+author: Phdhebde
+date: 2026-08-17
+tags:
+  - attack.command-and-control
+  - attack.t1105
+  # Taxonomie ATT&CK récente : « defense-evasion » a été scindée en
+  # « stealth » et « defense-impairment ». Proxifier via un binaire signé
+  # relève de la première.
+  - attack.stealth
+  - attack.t1218.010
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    # OriginalFileName résiste au simple renommage du binaire, pas Image.
+    # Garder les deux : le champ n'est pas toujours peuplé selon la config Sysmon.
+    - Image|endswith: '\certutil.exe'
+    - OriginalFileName: 'CertUtil.exe'
+  selection_cli:
+    CommandLine|contains:
+      - 'urlcache'
+      - 'verifyctl'
+  condition: all of selection_*
+falsepositives:
+  - À remplir après observation réelle — voir section 9 du write-up.
+level: medium
