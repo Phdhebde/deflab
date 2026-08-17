@@ -1,0 +1,21 @@
+# Site généré par MkDocs
+site/
+
+# Write-ups recopiés dans le site au moment du build (source = modules/*/README.md)
+docs/modules/
+
+# Caches de module : datasets publics, binaires d'outils, sorties d'analyse
+modules/*/.cache/
+modules/*/work/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Éditeurs / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

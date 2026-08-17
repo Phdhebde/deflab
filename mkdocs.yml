@@ -1,0 +1,72 @@
+site_name: Defensive Lab
+site_description: >-
+  Laboratoire de sécurité défensive modulaire — un module, une attaque,
+  une détection, un write-up.
+site_url: https://phdhebde.github.io/deflab/
+repo_url: https://github.com/Phdhebde/deflab
+repo_name: Phdhebde/deflab
+edit_uri: ""
+
+# Pas de `nav:` volontairement : la navigation est déduite de l'arborescence
+# `docs/`. Les write-ups arrivent dans `docs/modules/` via tools/sync_docs.py et
+# se classent d'eux-mêmes grâce au préfixe numérique (01-, 02-, ...).
+
+theme:
+  name: material
+  language: fr
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Passer en thème sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Passer en thème clair
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search:
+      lang: fr
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Phdhebde/deflab

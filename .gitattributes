@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.sh text eol=lf
+Makefile text eol=lf
+*.png binary
+*.jpg binary
+*.evtx binary
+*.pcap binary
+*.pcapng binary
+*.docx
