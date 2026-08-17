@@ -1,0 +1,91 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  structure:
+    name: Structure des write-ups
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Le gabarit n'est pas une bonne intention : c'est une contrainte mécanique.
+      - name: Dix sections obligatoires + interface Make uniforme
+        run: python tools/check_structure.py
+
+  site:
+    name: Build du site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-docs.txt
+      - run: python tools/sync_docs.py
+      - name: mkdocs build --strict
+        run: mkdocs build --strict
+
+  compose:
+    name: Validité des environnements
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker compose config sur chaque module
+        run: |
+          shopt -s nullglob
+          files=(modules/*/compose.yml)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "Aucun module avec compose.yml — rien à valider."
+            exit 0
+          fi
+          for f in "${files[@]}"; do
+            echo "::group::$f"
+            docker compose -f "$f" config --quiet
+            echo "::endgroup::"
+          done
+
+  detections:
+    name: Syntaxe des détections
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: sigma check
+        run: |
+          shopt -s nullglob
+          rules=(modules/*/detections/**/*.yml modules/*/detections/*.yml)
+          if [ ${#rules[@]} -eq 0 ]; then
+            echo "Aucune règle Sigma — rien à valider."
+            exit 0
+          fi
+          pip install sigma-cli
+          for d in modules/*/detections; do
+            [ -d "$d" ] || continue
+            echo "::group::$d"
+            sigma check "$d"
+            echo "::endgroup::"
+          done
+
+  links:
+    name: Liens morts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --exclude-path docs/modules './**/*.md'
+          fail: true
